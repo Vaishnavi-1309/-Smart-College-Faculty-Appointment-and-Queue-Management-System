@@ -1,0 +1,2 @@
+# -Smart-College-Faculty-Appointment-and-Queue-Management-System
+helps students and faculty manage meetings, signatures, and submissions through a digital queue system.  The system will:  Show faculty availability status Allow students to request faculty interaction Generate digital token numbers for queue management Reduce crowd during submission periods Help faculty handle students in an organized manner
