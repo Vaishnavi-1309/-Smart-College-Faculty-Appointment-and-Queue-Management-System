@@ -1,4 +1,4 @@
-# Environment variables - never upload to GitHub
+# Environment variables
 .env
 .env.local
 
