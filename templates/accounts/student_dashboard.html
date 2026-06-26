@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:20px">👋 Welcome, {{ user.username }}</h2>
+
+<div class="card">
+    <h3 style="margin-bottom:16px">Faculty List</h3>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        {% for faculty in faculties %}
+        <tr>
+            <td>{{ faculty.name }}</td>
+            <td>{{ faculty.department }}</td>
+            <td>
+                {% if faculty.status == 'available' %}
+                    <span class="badge-green">Available</span>
+                {% elif faculty.status == 'busy' %}
+                    <span class="badge-red">Busy in Lecture</span>
+                {% elif faculty.status == 'meeting' %}
+                    <span class="badge-orange">In Meeting</span>
+                {% else %}
+                    <span class="badge-red">Not Available</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="/queue/join/?faculty_id={{ faculty.id }}" class="btn btn-primary">Join Queue</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No faculty found.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% if my_tokens %}
+<div class="card">
+    <h3 style="margin-bottom:16px">My Active Tokens</h3>
+    <table>
+        <tr><th>Token</th><th>Faculty</th><th>Type</th><th>Status</th><th>Track</th></tr>
+        {% for token in my_tokens %}
+        <tr>
+            <td><strong>#{{ token.token_number }}</strong></td>
+            <td>{{ token.faculty.name }}</td>
+            <td>{{ token.request_type }}</td>
+            <td>{{ token.status }}</td>
+            <td><a href="/queue/track/{{ token.id }}/" class="btn btn-success">Track</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+{% endblock %}

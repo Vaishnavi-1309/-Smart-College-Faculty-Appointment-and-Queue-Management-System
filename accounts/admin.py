@@ -1,10 +1,17 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, Student, Faculty
 
-admin.site.register(CustomUser)
-admin.site.register(Student)
+class CustomUserAdmin(UserAdmin):
+    model = CustomUser
+    fieldsets = UserAdmin.fieldsets + (
+        ('Role', {'fields': ('role',)}),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ('Role', {'fields': ('role',)}),
+    )
+    list_display = ['username', 'email', 'role', 'is_active']
 
-@admin.register(Faculty)
-class FacultyAdmin(admin.ModelAdmin):
-    verbose_name_plural = "Faculties"  # fixes "Facultys" spelling
-    list_display = ['name', 'department', 'status', 'employee_id']
+admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Student)
+admin.site.register(Faculty)

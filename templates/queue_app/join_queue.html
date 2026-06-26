@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Join Queue{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:20px">Join Queue</h2>
+
+<div class="card">
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Select Faculty</label>
+        <select name="faculty_id" required>
+            <option value="">-- Select Faculty --</option>
+            {% for faculty in faculties %}
+            <option value="{{ faculty.id }}"
+                {% if selected_faculty and selected_faculty.id == faculty.id %}selected{% endif %}>
+                {{ faculty.name }} — {{ faculty.department }}
+                ({{ faculty.get_status_display }})
+            </option>
+            {% endfor %}
+        </select>
+
+        <label>Request Type</label>
+        <select name="request_type" required>
+            <option value="">-- Select Type --</option>
+            <option value="signature">Signature</option>
+            <option value="assignment">Assignment Submission</option>
+            <option value="doubt">Doubt Solving</option>
+            <option value="project">Project Discussion</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary" style="width:100%; padding:12px;">
+            🎫 Get Token & Join Queue
+        </button>
+    </form>
+</div>
+
+<a href="{% url 'student_dashboard' %}" class="btn btn-danger" style="margin-top:10px;">
+    ← Back to Dashboard
+</a>
+
+{% endblock %}

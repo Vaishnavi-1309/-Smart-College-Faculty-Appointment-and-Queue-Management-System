@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div style="max-width:400px; margin:60px auto;">
+    <div class="card">
+        <h2 style="margin-bottom:20px; color:#1a237e; text-align:center">🎓 Campus Queue Login</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label>Username</label>
+            <input type="text" name="username" placeholder="Enter your username" required>
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Enter your password" required>
+            <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:15px;">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
