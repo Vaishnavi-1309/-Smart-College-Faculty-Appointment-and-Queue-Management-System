@@ -1,43 +1,76 @@
 {% extends 'base.html' %}
 {% block title %}Faculty Dashboard{% endblock %}
 {% block content %}
-<h2 style="margin-bottom:20px">👨‍🏫 Welcome, {{ faculty.name }}</h2>
+
+<div class="page-header">
+    <h2>👨‍🏫 Welcome, {{ faculty.name }}</h2>
+    <p>{{ faculty.department }} — Manage your student queue</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h1>{{ queue.count }}</h1>
+        <p>Students in Queue</p>
+    </div>
+    <div class="stat-card green">
+        <h1>{% if current %}1{% else %}0{% endif %}</h1>
+        <p>Currently Processing</p>
+    </div>
+    <div class="stat-card orange">
+        <h1>{{ pending_requests.count }}</h1>
+        <p>Pending Requests</p>
+    </div>
+</div>
 
 <div class="card">
-    <h3 style="margin-bottom:12px">Update Your Status</h3>
-    <form method="POST" action="/faculty/update-status/">
+    <h3>🔄 Update Your Status</h3>
+    <form method="POST" action="/faculty/update-status/" style="display:flex; gap:12px; align-items:center;">
         {% csrf_token %}
-        <select name="status" style="width:auto; display:inline; margin-right:10px;">
-            <option value="available" {% if faculty.status == 'available' %}selected{% endif %}>Available</option>
-            <option value="busy" {% if faculty.status == 'busy' %}selected{% endif %}>Busy in Lecture</option>
-            <option value="meeting" {% if faculty.status == 'meeting' %}selected{% endif %}>In Meeting</option>
-            <option value="not_available" {% if faculty.status == 'not_available' %}selected{% endif %}>Not Available</option>
+        <select name="status" style="width:auto; margin-bottom:0;">
+            <option value="available" {% if faculty.status == 'available' %}selected{% endif %}>✅ Available</option>
+            <option value="busy" {% if faculty.status == 'busy' %}selected{% endif %}>🔴 Busy in Lecture</option>
+            <option value="meeting" {% if faculty.status == 'meeting' %}selected{% endif %}>🟠 In Meeting</option>
+            <option value="not_available" {% if faculty.status == 'not_available' %}selected{% endif %}>⚫ Not Available</option>
         </select>
-        <button type="submit" class="btn btn-primary">Update</button>
+        <button type="submit" class="btn btn-primary">Update Status</button>
     </form>
 </div>
 
 <div class="card">
-    <h3 style="margin-bottom:12px">
-        Queue — Currently Processing:
+    <h3>
+        👥 Queue
         {% if current %}
-            <span class="badge-green">Token #{{ current.token_number }} — {{ current.student.name }}</span>
+            — Now Calling: <span class="badge badge-green">Token #{{ current.token_number }} — {{ current.student.name }}</span>
         {% else %}
-            <span class="badge-orange">No one yet</span>
+            — <span class="badge badge-gray">No one processing yet</span>
         {% endif %}
     </h3>
+
     <form method="POST" action="/faculty/start-session/" style="margin-bottom:16px;">
         {% csrf_token %}
-        <button type="submit" class="btn btn-success">▶ Start / Next Student</button>
+        <button type="submit" class="btn btn-success">▶ Start / Call Next Student</button>
     </form>
+
     <table>
-        <tr><th>Token</th><th>Student</th><th>Request Type</th><th>Status</th><th>Action</th></tr>
+        <tr>
+            <th>Token</th>
+            <th>Student</th>
+            <th>Request Type</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
         {% for token in queue %}
         <tr>
-            <td><strong>#{{ token.token_number }}</strong></td>
+            <td><strong style="color:#1a237e; font-size:16px;">#{{ token.token_number }}</strong></td>
             <td>{{ token.student.name }}</td>
             <td>{{ token.request_type }}</td>
-            <td>{{ token.status }}</td>
+            <td>
+                {% if token.status == 'processing' %}
+                    <span class="badge badge-green">🔔 Processing</span>
+                {% else %}
+                    <span class="badge badge-orange">⏳ Waiting</span>
+                {% endif %}
+            </td>
             <td>
                 {% if token.status == 'processing' %}
                 <form method="POST" action="/faculty/complete/{{ token.id }}/">
@@ -48,8 +81,9 @@
             </td>
         </tr>
         {% empty %}
-        <tr><td colspan="5">No students in queue.</td></tr>
+        <tr><td colspan="5" style="text-align:center; color:#999; padding:30px;">No students in queue.</td></tr>
         {% endfor %}
     </table>
 </div>
+
 {% endblock %}

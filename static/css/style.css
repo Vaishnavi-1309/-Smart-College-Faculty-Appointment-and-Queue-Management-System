@@ -1,0 +1,387 @@
+/* ===== GLOBAL ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f2f5;
+    color: #333;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+    background: linear-gradient(135deg, #1a237e, #283593);
+    color: white;
+    padding: 0 30px;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-brand {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.navbar-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 14px;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+}
+
+.navbar-links a:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+.navbar-user {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-right: 16px;
+}
+
+/* ===== CONTAINER ===== */
+.container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* ===== CARDS ===== */
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e8eaf6;
+}
+
+.card h3 {
+    font-size: 16px;
+    color: #1a237e;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e8eaf6;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    display: inline-block;
+    padding: 9px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #1a237e, #3949ab);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #283593, #3f51b5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26,35,126,0.3);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #2e7d32, #43a047);
+    color: white;
+}
+
+.btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(46,125,50,0.3);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #c62828, #e53935);
+    color: white;
+}
+
+.btn-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(198,40,40,0.3);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #e65100, #f57c00);
+    color: white;
+}
+
+/* ===== BADGES ===== */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-green {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.badge-red {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+.badge-orange {
+    background: #fff3e0;
+    color: #e65100;
+    border: 1px solid #ffcc80;
+}
+
+.badge-gray {
+    background: #eceff1;
+    color: #546e7a;
+    border: 1px solid #cfd8dc;
+}
+
+.badge-blue {
+    background: #e8eaf6;
+    color: #1a237e;
+    border: 1px solid #9fa8da;
+}
+
+/* ===== MESSAGES ===== */
+.messages {
+    margin-bottom: 20px;
+}
+
+.msg {
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.msg-success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-left: 4px solid #2e7d32;
+}
+
+.msg-error {
+    background: #ffebee;
+    color: #c62828;
+    border-left: 4px solid #c62828;
+}
+
+.msg-warning {
+    background: #fff8e1;
+    color: #f57f17;
+    border-left: 4px solid #f9a825;
+}
+
+.msg-info {
+    background: #e3f2fd;
+    color: #1565c0;
+    border-left: 4px solid #1565c0;
+}
+
+/* ===== TABLE ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+th {
+    background: #e8eaf6;
+    color: #1a237e;
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+tr:hover td {
+    background: #f8f9ff;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===== FORMS ===== */
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+input, select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fafafa;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #3949ab;
+    box-shadow: 0 0 0 3px rgba(57,73,171,0.1);
+    background: white;
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+    margin-bottom: 24px;
+}
+
+.page-header h2 {
+    font-size: 22px;
+    color: #1a237e;
+    font-weight: 700;
+}
+
+.page-header p {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+}
+
+/* ===== STATS CARDS ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-top: 4px solid #3949ab;
+}
+
+.stat-card.green { border-top-color: #43a047; }
+.stat-card.orange { border-top-color: #f57c00; }
+.stat-card.red { border-top-color: #e53935; }
+
+.stat-card h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1a237e;
+}
+
+.stat-card.green h1 { color: #2e7d32; }
+.stat-card.orange h1 { color: #e65100; }
+.stat-card.red h1 { color: #c62828; }
+
+.stat-card p {
+    font-size: 13px;
+    color: #888;
+    margin-top: 4px;
+}
+
+/* ===== TOKEN DISPLAY ===== */
+.token-display {
+    background: linear-gradient(135deg, #e8eaf6, #c5cae9);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.token-number {
+    font-size: 80px;
+    font-weight: 800;
+    color: #1a237e;
+    line-height: 1;
+}
+
+.token-label {
+    font-size: 14px;
+    color: #666;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ===== LOGIN PAGE ===== */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a237e, #3949ab, #5c6bc0);
+}
+
+.login-card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+.login-logo {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.login-logo h1 {
+    font-size: 28px;
+    color: #1a237e;
+    font-weight: 800;
+}
+
+.login-logo p {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+    .container { padding: 0 12px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .token-number { font-size: 56px; }
+    .navbar { padding: 0 16px; }
+}

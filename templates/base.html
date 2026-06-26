@@ -1,52 +1,44 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Campus Queue System{% endblock %}</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f4f6f8; color: #333; }
-        nav { background: #1a237e; color: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; }
-        nav a { color: white; text-decoration: none; margin-left: 16px; font-size: 14px; }
-        .container { max-width: 960px; margin: 30px auto; padding: 0 20px; }
-        .card { background: white; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-        .btn { display: inline-block; padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; text-decoration: none; }
-        .btn-primary { background: #1a237e; color: white; }
-        .btn-success { background: #2e7d32; color: white; }
-        .btn-danger { background: #c62828; color: white; }
-        .btn:hover { opacity: 0.9; }
-        .badge-green { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 99px; font-size: 12px; }
-        .badge-red { background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 99px; font-size: 12px; }
-        .badge-orange { background: #fff3e0; color: #e65100; padding: 4px 10px; border-radius: 99px; font-size: 12px; }
-        .msg { padding: 10px 16px; border-radius: 6px; margin-bottom: 8px; font-size: 14px; }
-        .msg-error { background: #ffebee; color: #c62828; border-left: 4px solid #c62828; }
-        .msg-success { background: #e8f5e9; color: #2e7d32; border-left: 4px solid #2e7d32; }
-        .msg-warning { background: #fff8e1; color: #f57f17; border-left: 4px solid #f57f17; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { background: #e8eaf6; padding: 10px; text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
-        label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 6px; color: #555; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; margin-bottom: 14px; }
-    </style>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-<nav>
-    <span style="font-weight:bold;font-size:16px">🎓 Campus Queue System</span>
-    <div>
-        {% if user.is_authenticated %}
-            <span style="font-size:14px">Hello, {{ user.username }}</span>
+
+{% if user.is_authenticated %}
+<nav class="navbar">
+    <div class="navbar-brand">🎓 Campus Queue System</div>
+    <div style="display:flex; align-items:center;">
+        <span class="navbar-user">👤 {{ user.username }}</span>
+        <div class="navbar-links">
+            {% if user.role == 'student' %}
+                <a href="{% url 'student_dashboard' %}">Dashboard</a>
+                <a href="{% url 'join_queue' %}">Join Queue</a>
+            {% elif user.role == 'faculty' %}
+                <a href="{% url 'faculty_dashboard' %}">Dashboard</a>
+            {% endif %}
             <a href="{% url 'logout' %}">Logout</a>
-        {% endif %}
+        </div>
     </div>
 </nav>
-<div class="container">
+{% endif %}
+
+<div {% if not user.is_authenticated %}class="login-wrapper"{% else %}class="container"{% endif %}>
     {% if messages %}
+    <div class="messages">
         {% for message in messages %}
         <div class="msg msg-{{ message.tags }}">{{ message }}</div>
         {% endfor %}
+    </div>
     {% endif %}
+
     {% block content %}{% endblock %}
 </div>
+
 </body>
 </html>

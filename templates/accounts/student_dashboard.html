@@ -1,10 +1,23 @@
 {% extends 'base.html' %}
 {% block title %}Student Dashboard{% endblock %}
 {% block content %}
-<h2 style="margin-bottom:20px">👋 Welcome, {{ user.username }}</h2>
+
+<div class="page-header">
+    <h2>👋 Welcome, {{ user.username }}</h2>
+    <p>Check faculty availability and join queues</p>
+</div>
+
+{% if my_tokens %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <h1>{{ my_tokens.count }}</h1>
+        <p>Active Tokens</p>
+    </div>
+</div>
+{% endif %}
 
 <div class="card">
-    <h3 style="margin-bottom:16px">Faculty List</h3>
+    <h3>📋 Faculty List</h3>
     <table>
         <tr>
             <th>Name</th>
@@ -14,44 +27,57 @@
         </tr>
         {% for faculty in faculties %}
         <tr>
-            <td>{{ faculty.name }}</td>
+            <td><strong>{{ faculty.name }}</strong></td>
             <td>{{ faculty.department }}</td>
             <td>
                 {% if faculty.status == 'available' %}
-                    <span class="badge-green">Available</span>
+                    <span class="badge badge-green">✅ Available</span>
                 {% elif faculty.status == 'busy' %}
-                    <span class="badge-red">Busy in Lecture</span>
+                    <span class="badge badge-red">🔴 Busy in Lecture</span>
                 {% elif faculty.status == 'meeting' %}
-                    <span class="badge-orange">In Meeting</span>
+                    <span class="badge badge-orange">🟠 In Meeting</span>
                 {% else %}
-                    <span class="badge-red">Not Available</span>
+                    <span class="badge badge-gray">⚫ Not Available</span>
                 {% endif %}
             </td>
             <td>
-                <a href="/queue/join/?faculty_id={{ faculty.id }}" class="btn btn-primary">Join Queue</a>
+                <a href="/queue/join/?faculty_id={{ faculty.id }}" class="btn btn-primary">🎫 Join Queue</a>
             </td>
         </tr>
         {% empty %}
-        <tr><td colspan="4">No faculty found.</td></tr>
+        <tr><td colspan="4" style="text-align:center; color:#999; padding:30px;">No faculty found.</td></tr>
         {% endfor %}
     </table>
 </div>
 
 {% if my_tokens %}
 <div class="card">
-    <h3 style="margin-bottom:16px">My Active Tokens</h3>
+    <h3>🎫 My Active Tokens</h3>
     <table>
-        <tr><th>Token</th><th>Faculty</th><th>Type</th><th>Status</th><th>Track</th></tr>
+        <tr>
+            <th>Token</th>
+            <th>Faculty</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
         {% for token in my_tokens %}
         <tr>
-            <td><strong>#{{ token.token_number }}</strong></td>
+            <td><strong style="color:#1a237e; font-size:16px;">#{{ token.token_number }}</strong></td>
             <td>{{ token.faculty.name }}</td>
             <td>{{ token.request_type }}</td>
-            <td>{{ token.status }}</td>
-            <td><a href="/queue/track/{{ token.id }}/" class="btn btn-success">Track</a></td>
+            <td>
+                {% if token.status == 'waiting' %}
+                    <span class="badge badge-orange">⏳ Waiting</span>
+                {% elif token.status == 'processing' %}
+                    <span class="badge badge-green">🔔 Your Turn!</span>
+                {% endif %}
+            </td>
+            <td><a href="/queue/track/{{ token.id }}/" class="btn btn-success">📍 Track</a></td>
         </tr>
         {% endfor %}
     </table>
 </div>
 {% endif %}
+
 {% endblock %}
