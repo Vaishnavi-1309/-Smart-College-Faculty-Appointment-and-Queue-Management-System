@@ -12,6 +12,9 @@ class CustomUserAdmin(UserAdmin):
     )
     list_display = ['username', 'email', 'role', 'is_active']
 
+@admin.register(Student)
+class StudentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'prn_number', 'department', 'email']
+
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(Student)
 admin.site.register(Faculty)

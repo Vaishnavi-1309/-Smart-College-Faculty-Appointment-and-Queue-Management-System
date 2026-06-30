@@ -1,10 +1,44 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse
 from accounts.models import Faculty
 from queue_app.models import QueueToken, Request
+from django.core.mail import send_mail
+from django.conf import settings
 
+def send_turn_notification(token):
+    student = token.student
+    if not student.email:
+        return  # skip if no email saved
+    
+    subject = f'🔔 Your turn is coming soon! — Token #{token.token_number}'
+    message = f'''
+Hello {student.name},
 
+Your turn is coming soon at the Campus Queue System!
+
+Faculty: {token.faculty.name}
+Department: {token.faculty.department}
+Your Token Number: #{token.token_number}
+Request Type: {token.request_type}
+
+Please make your way to the faculty cabin now.
+
+Thank you,
+Campus Queue System
+    '''
+    
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [student.email],
+            fail_silently=True,
+        )
+    except Exception:
+        pass  # don't crash if email fails
 @login_required
 def join_queue(request):
     faculty_id = request.GET.get('faculty_id')
@@ -78,3 +112,32 @@ def track_queue(request, token_id):
         'current': current,
         'estimated_wait': estimated_wait,
     })
+    from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+
+@login_required
+def queue_status_api(request, token_id):
+    try:
+        token = get_object_or_404(QueueToken, id=token_id)
+        
+        people_ahead = QueueToken.objects.filter(
+            faculty=token.faculty,
+            status='waiting',
+            token_number__lt=token.token_number
+        ).count()
+
+        current = QueueToken.objects.filter(
+            faculty=token.faculty,
+            status='processing'
+        ).first()
+
+        return JsonResponse({
+            'token_status': token.status,
+            'token_number': token.token_number,
+            'people_ahead': people_ahead,
+            'estimated_wait': people_ahead * 5,
+            'current_token': current.token_number if current else None,
+            'current_student': current.student.name if current else None,
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

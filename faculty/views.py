@@ -3,6 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from accounts.models import Faculty
 from queue_app.models import QueueToken, Request
+import qrcode
+import io
+import base64
 
 
 @login_required
@@ -18,11 +21,13 @@ def update_status(request):
 
 @login_required
 def complete_token(request, token_id):
+    from queue_app.views import send_turn_notification
+
     token = get_object_or_404(QueueToken, id=token_id)
     token.status = 'completed'
     token.save()
 
-    # Automatically start next token
+    # Get next waiting token
     next_token = QueueToken.objects.filter(
         faculty=token.faculty,
         status='waiting'
@@ -32,6 +37,16 @@ def complete_token(request, token_id):
         next_token.status = 'processing'
         next_token.save()
         messages.success(request, f'Token {token.token_number} completed. Now calling Token {next_token.token_number}.')
+
+        # Send email to student who is 2nd in queue
+        second_token = QueueToken.objects.filter(
+            faculty=token.faculty,
+            status='waiting'
+        ).order_by('token_number').first()
+
+        if second_token:
+            send_turn_notification(second_token)
+
     else:
         messages.success(request, f'Token {token.token_number} completed. No more students in queue.')
 
@@ -66,3 +81,34 @@ def start_session(request):
         messages.info(request, 'No students in queue right now.')
 
     return redirect('faculty_dashboard')
+
+@login_required
+def get_qr_code(request):
+    faculty = request.user.faculty
+    
+    # URL that student will be taken to when they scan
+    join_url = request.build_absolute_uri(f'/queue/join/?faculty_id={faculty.id}')
+    
+    # Generate QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(join_url)
+    qr.make(fit=True)
+    
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convert to base64 so we can show in HTML
+    buffer = io.BytesIO()
+    img.save(buffer, format='PNG')
+    buffer.seek(0)
+    img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    
+    return render(request, 'faculty/qr_code.html', {
+        'faculty': faculty,
+        'qr_image': img_base64,
+        'join_url': join_url,
+    })

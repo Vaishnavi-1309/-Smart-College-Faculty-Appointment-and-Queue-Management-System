@@ -14,6 +14,7 @@ class Student(models.Model):
     prn_number = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
     department = models.CharField(max_length=100)
+    email = models.EmailField(blank=True, null=True)  # ← add this
 
     def __str__(self):
         return f"{self.name} - {self.prn_number}"

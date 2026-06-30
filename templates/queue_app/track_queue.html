@@ -7,53 +7,116 @@
     <p>Faculty: {{ token.faculty.name }} — {{ token.faculty.department }}</p>
 </div>
 
-<div class="card" style="text-align:center;">
+<div class="card" style="text-align:center;" id="queue-card">
 
     <div class="token-display">
         <div class="token-label">Your Token Number</div>
         <div class="token-number">#{{ token.token_number }}</div>
-        <div class="token-label" style="margin-top:12px;">{{ token.get_request_type_display|default:token.request_type }}</div>
+        <div class="token-label" style="margin-top:12px;">{{ token.request_type }}</div>
     </div>
 
-    {% if token.status == 'completed' %}
-        <div class="msg msg-success" style="justify-content:center; font-size:16px;">
-            ✅ Your work is completed! Thank you.
-        </div>
-
-    {% elif token.status == 'processing' %}
-        <div class="msg msg-warning" style="justify-content:center; font-size:16px;">
-            🔔 It's YOUR turn now! Please go to the faculty cabin immediately.
-        </div>
-
-    {% else %}
-        <div class="stats-grid" style="max-width:400px; margin:0 auto 20px;">
-            <div class="stat-card">
-                <h1>{% if current %}#{{ current.token_number }}{% else %}—{% endif %}</h1>
-                <p>Currently Processing</p>
+    <div id="status-section">
+        {% if token.status == 'completed' %}
+            <div class="msg msg-success" style="justify-content:center; font-size:16px;">
+                ✅ Your work is completed! Thank you.
             </div>
-            <div class="stat-card orange">
-                <h1>{{ people_ahead }}</h1>
-                <p>People Ahead</p>
-            </div>
-            <div class="stat-card green">
-                <h1>{{ estimated_wait }}</h1>
-                <p>Est. Wait (min)</p>
-            </div>
-        </div>
 
-        <p style="font-size:13px; color:#aaa;">🔄 Page refreshes automatically every 30 seconds</p>
-    {% endif %}
+        {% elif token.status == 'processing' %}
+            <div class="msg msg-warning" style="justify-content:center; font-size:16px;">
+                🔔 It's YOUR turn now! Please go to the faculty cabin immediately.
+            </div>
+
+        {% else %}
+            <div class="stats-grid" style="max-width:400px; margin:0 auto 16px;">
+                <div class="stat-card" id="card-current">
+                    <h1 id="current-token">{% if current %}#{{ current.token_number }}{% else %}—{% endif %}</h1>
+                    <p>Currently Processing</p>
+                </div>
+                <div class="stat-card orange" id="card-ahead">
+                    <h1 id="people-ahead">{{ people_ahead }}</h1>
+                    <p>People Ahead</p>
+                </div>
+                <div class="stat-card green" id="card-wait">
+                    <h1 id="est-wait">{{ estimated_wait }}</h1>
+                    <p>Est. Wait (min)</p>
+                </div>
+            </div>
+
+            <!-- Live indicator -->
+            <div id="live-bar" style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:12px;">
+                <span id="live-dot" style="width:10px; height:10px; border-radius:50%; background:#2e7d32; display:inline-block; animation: pulse 1.5s infinite;"></span>
+                <span style="font-size:13px; color:#888;" id="live-text">Live — updating every 5 seconds</span>
+            </div>
+        {% endif %}
+    </div>
 
 </div>
 
-<div style="text-align:center;">
+<div style="text-align:center; margin-top:10px;">
     <a href="{% url 'student_dashboard' %}" class="btn btn-primary">← Back to Dashboard</a>
 </div>
 
+<style>
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+}
+</style>
+
 <script>
-    {% if token.status == 'waiting' or token.status == 'processing' %}
-    setTimeout(function(){ location.reload(); }, 30000);
-    {% endif %}
+    const tokenId = {{ token.id }};
+    const currentStatus = "{{ token.status }}";
+
+    function updateQueue() {
+        fetch(`/queue/api/status/${tokenId}/`)
+            .then(res => res.json())
+            .then(data => {
+
+                // If status changed to processing — show alert
+                if (data.token_status === 'processing' && currentStatus === 'waiting') {
+                    document.getElementById('status-section').innerHTML = `
+                        <div class="msg msg-warning" style="justify-content:center; font-size:16px;">
+                            🔔 It's YOUR turn now! Please go to the faculty cabin immediately.
+                        </div>
+                    `;
+                    return;
+                }
+
+                // If completed
+                if (data.token_status === 'completed') {
+                    document.getElementById('status-section').innerHTML = `
+                        <div class="msg msg-success" style="justify-content:center; font-size:16px;">
+                            ✅ Your work is completed! Thank you.
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Update live numbers
+                const currentEl = document.getElementById('current-token');
+                const aheadEl = document.getElementById('people-ahead');
+                const waitEl = document.getElementById('est-wait');
+
+                if (currentEl) currentEl.textContent = data.current_token ? '#' + data.current_token : '—';
+                if (aheadEl) aheadEl.textContent = data.people_ahead;
+                if (waitEl) waitEl.textContent = data.estimated_wait;
+
+                // Update live text with last updated time
+                const now = new Date();
+                const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+                const liveText = document.getElementById('live-text');
+                if (liveText) liveText.textContent = `Live — last updated at ${timeStr}`;
+            })
+            .catch(err => {
+                const liveText = document.getElementById('live-text');
+                if (liveText) liveText.textContent = 'Connection lost — retrying...';
+            });
+    }
+
+    // Only run if still waiting
+    if (currentStatus === 'waiting' || currentStatus === 'processing') {
+        setInterval(updateQueue, 5000);
+    }
 </script>
 
 {% endblock %}
