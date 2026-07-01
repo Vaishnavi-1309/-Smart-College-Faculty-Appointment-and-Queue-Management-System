@@ -9,16 +9,20 @@
         {% csrf_token %}
 
         <label>Select Faculty</label>
-        <select name="faculty_id" required>
+        <select name="faculty_id" id="faculty_select" required onchange="showSchedule()">
             <option value="">-- Select Faculty --</option>
             {% for faculty in faculties %}
             <option value="{{ faculty.id }}"
+                data-open="{{ faculty.is_within_working_hours }}"
+                data-today="{% with s=faculty.todays_schedule %}{% if s %}{{ s.start_time }} - {{ s.end_time }}{% else %}Closed today{% endif %}{% endwith %}"
                 {% if selected_faculty and selected_faculty.id == faculty.id %}selected{% endif %}>
                 {{ faculty.name }} — {{ faculty.department }}
                 ({{ faculty.get_status_display }})
             </option>
             {% endfor %}
         </select>
+
+        <div id="schedule-info" style="display:none; margin-bottom:16px;"></div>
 
         <label>Request Type</label>
         <select name="request_type" required>
@@ -38,5 +42,30 @@
 <a href="{% url 'student_dashboard' %}" class="btn btn-danger" style="margin-top:10px;">
     ← Back to Dashboard
 </a>
+
+<script>
+function showSchedule() {
+    const select = document.getElementById('faculty_select');
+    const selected = select.options[select.selectedIndex];
+    const infoBox = document.getElementById('schedule-info');
+
+    if (!selected.value) {
+        infoBox.style.display = 'none';
+        return;
+    }
+
+    const isOpen = selected.getAttribute('data-open') === 'True';
+    const todaySchedule = selected.getAttribute('data-today');
+
+    infoBox.style.display = 'block';
+    if (isOpen) {
+        infoBox.innerHTML = `<div class="msg msg-success">✅ Open now — Today's hours: ${todaySchedule}</div>`;
+    } else {
+        infoBox.innerHTML = `<div class="msg msg-warning">⚠️ Closed right now — Today's hours: ${todaySchedule}</div>`;
+    }
+}
+
+window.onload = showSchedule;
+</script>
 
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Student, Faculty
+from .models import CustomUser, Student, Faculty, Schedule
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
@@ -15,6 +15,11 @@ class CustomUserAdmin(UserAdmin):
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
     list_display = ['name', 'prn_number', 'department', 'email']
+
+@admin.register(Schedule)
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ['faculty', 'day', 'start_time', 'end_time']
+    list_filter = ['faculty', 'day']
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Faculty)

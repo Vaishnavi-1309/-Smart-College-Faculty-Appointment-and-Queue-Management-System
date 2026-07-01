@@ -6,6 +6,23 @@
     <h2>👨‍🏫 Welcome, {{ faculty.name }}</h2>
     <p>{{ faculty.department }} — Manage your student queue</p>
 </div>
+<div class="card">
+    <h3>📅 My Weekly Schedule</h3>
+    {% if faculty.schedules.all %}
+    <table>
+        <tr><th>Day</th><th>Start Time</th><th>End Time</th></tr>
+        {% for schedule in faculty.schedules.all %}
+        <tr>
+            <td>{{ schedule.get_day_display }}</td>
+            <td>{{ schedule.start_time }}</td>
+            <td>{{ schedule.end_time }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p style="color:#999;">No schedule set. Add your working hours from the admin panel.</p>
+    {% endif %}
+</div>
 
 <div class="stats-grid">
     <div class="stat-card">

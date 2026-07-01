@@ -52,6 +52,11 @@ def join_queue(request):
         faculty = get_object_or_404(Faculty, id=faculty_id)
         student = request.user.student
 
+        # Check working hours
+        if not faculty.is_within_working_hours():
+            messages.error(request, f'{faculty.name} is currently outside working hours. Please check their schedule.')
+            return redirect('join_queue')
+
         # Check if student already in this queue
         already_in = QueueToken.objects.filter(
             student=student,
@@ -84,7 +89,6 @@ def join_queue(request):
         'faculties': faculties,
         'selected_faculty': selected_faculty,
     })
-
 
 @login_required
 def track_queue(request, token_id):
