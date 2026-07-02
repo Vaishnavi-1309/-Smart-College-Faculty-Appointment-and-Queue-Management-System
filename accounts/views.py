@@ -32,7 +32,6 @@ def login_view(request):
             messages.error(request, 'Invalid username or password.')
 
     return render(request, 'accounts/login.html')
-
 @login_required
 def dashboard_view(request):
     role = request.user.role
@@ -41,7 +40,7 @@ def dashboard_view(request):
     elif role == 'faculty':
         return redirect('faculty_dashboard')
     elif role == 'admin':
-        return redirect('/admin/')
+        return redirect('analytics')  # ← change from /admin/ to analytics
     return redirect('login')
 
 

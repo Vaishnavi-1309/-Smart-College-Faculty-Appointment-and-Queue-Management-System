@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Admin Analytics Dashboard{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h2>📊 Analytics Dashboard</h2>
+    <p>Overview of the Campus Queue System</p>
+</div>
+
+<!-- Summary Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <h1>{{ total_served }}</h1>
+        <p>Total Students Served</p>
+    </div>
+    <div class="stat-card orange">
+        <h1>{{ total_waiting }}</h1>
+        <p>Currently Waiting</p>
+    </div>
+    <div class="stat-card green">
+        <h1>{{ total_students }}</h1>
+        <p>Total Students</p>
+    </div>
+    <div class="stat-card" style="border-top-color:#7b1fa2;">
+        <h1>{{ total_faculty }}</h1>
+        <p>Total Faculty</p>
+    </div>
+</div>
+
+<!-- Charts Row 1 -->
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
+
+    <!-- Daily Students Served -->
+    <div class="card">
+        <h3>📅 Students Served Per Day</h3>
+        <canvas id="dailyChart" height="200"></canvas>
+    </div>
+
+    <!-- Request Types Pie -->
+    <div class="card">
+        <h3>📋 Request Types Breakdown</h3>
+        <canvas id="requestChart" height="200"></canvas>
+    </div>
+
+</div>
+
+<!-- Charts Row 2 -->
+<div class="card">
+    <h3>👨‍🏫 Busiest Faculty</h3>
+    <canvas id="facultyChart" height="100"></canvas>
+</div>
+
+<!-- Quick Links -->
+<div class="card">
+    <h3>⚙️ Quick Admin Actions</h3>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="/admin/accounts/student/add/" class="btn btn-primary">+ Add Student</a>
+        <a href="/admin/accounts/faculty/add/" class="btn btn-success">+ Add Faculty</a>
+        <a href="/admin/accounts/schedule/add/" class="btn btn-warning">+ Add Schedule</a>
+        <a href="/admin/" class="btn btn-danger">Django Admin Panel</a>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Daily chart
+    const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+    new Chart(dailyCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ daily_labels|safe }},
+            datasets: [{
+                label: 'Students Served',
+                data: {{ daily_data|safe }},
+                backgroundColor: 'rgba(57, 73, 171, 0.7)',
+                borderColor: '#1a237e',
+                borderWidth: 1,
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+
+    // Request type pie chart
+    const requestCtx = document.getElementById('requestChart').getContext('2d');
+    new Chart(requestCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ request_labels|safe }},
+            datasets: [{
+                data: {{ request_data|safe }},
+                backgroundColor: [
+                    '#3949ab', '#43a047', '#f57c00', '#e53935', '#8e24aa'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff',
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Faculty bar chart
+    const facultyCtx = document.getElementById('facultyChart').getContext('2d');
+    new Chart(facultyCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ faculty_labels|safe }},
+            datasets: [{
+                label: 'Total Tokens',
+                data: {{ faculty_data|safe }},
+                backgroundColor: [
+                    '#3949ab', '#43a047', '#f57c00', '#e53935', '#8e24aa'
+                ],
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+</script>
+
+{% endblock %}
